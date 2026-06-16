@@ -13,24 +13,7 @@ library(primer.data)
 library(tidymodels)
 library(broom)
 library(gt)
-```
-
-Here's the clean version:
----
-title: "Shaming"
-author: "Var Kurapati"
-format: html
-execute:
-  echo: false
----
-
-```{r}
-#| message: false
-library(tidyverse)
-library(primer.data)
-library(tidymodels)
-library(broom)
-library(gt)
+library(marginaleffects)
 ```
 
 ```{r}
@@ -52,44 +35,33 @@ x <- shaming |>
 ```
 
 ```{r}
-x |>
-  group_by(treatment, voter_class) |>
-  summarize(turnout = mean(primary_06 == "Yes"), .groups = "drop") |>
-  ggplot(aes(x = treatment, y = turnout, fill = treatment)) +
-  geom_col() +
-  geom_text(aes(label = scales::label_percent(accuracy = 0.1)(turnout)),
-            vjust = -0.5, size = 3) +
-  scale_y_continuous(labels = scales::label_percent()) +
-  facet_wrap(~ voter_class) +
-  labs(
-    title = "August 2006 Primary Turnout by Treatment and Voter Class",
-    subtitle = "Neighbors postcard shows largest effect across all voter classes",
-    x = "Treatment",
-    y = "Turnout Rate",
-    fill = "Treatment",
-    caption = "Source: Gerber, Green, Larimer 2008 via primer.data::shaming"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_blank())
-```
-
-Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters' past turnout records to their neighbors — on the probability of voting in the August 2006 primary. However, because the experiment was conducted in Michigan in 2006, the estimated effect of the Neighbors postcard may not transfer to Texas in 2026. Both the political environment and voter demographics differ substantially, and the novelty of social-pressure postcards has likely diminished over two decades. We model the probability of voting as a Bernoulli variable which is a logistic function of age, sex, treatment, voter class, and their interaction, allowing the causal effect of each postcard to vary across voter engagement levels.
-
-
-```{r}
 #| cache: true
 fit_shaming <- logistic_reg(engine = "glm") |> fit(voted ~ age + sex + treatment*voter_class, data = x)
 ```
 
 ```{r}
-tidy(fit_shaming, conf.int = TRUE) |>
-  select(term, estimate, conf.low, conf.high) |>
-  mutate(across(c(estimate, conf.low, conf.high), \(x) round(x, 3))) |>
-  gt() |>
-  tab_header(title = "Estimates and 95% Confidence Intervals for Parameters",
-             subtitle = "Source: Gerber, Green, Larimer 2008 via primer.data::shaming")
+plot_predictions(extract_fit_engine(fit_shaming), 
+                 condition = c("treatment", "voter_class"), 
+                 draw = FALSE) |>
+  ggplot(aes(x = treatment, y = estimate, color = voter_class, group = voter_class)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  facet_wrap(~ voter_class) +
+  labs(
+    title = "Predicted Probability of Voting by Treatment and Voter Class",
+    subtitle = "Neighbors postcard has largest effect on Sometimes and Always Vote voters",
+    x = "Treatment",
+    y = "Predicted Probability of Voting",
+    color = "Voter Class",
+    caption = "Source: Gerber, Green, Larimer 2008 via primer.data::shaming"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
 ```
 
+Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters' past turnout records to their neighbors — on the probability of voting in the August 2006 primary. However, because the experiment was conducted in Michigan in 2006, the estimated effect of the Neighbors postcard may not transfer to Texas in 2026. Both the political environment and voter demographics differ substantially, and the novelty of social-pressure postcards has likely diminished over two decades. We model the probability of voting as a Bernoulli variable which is a logistic function of age, sex, treatment, voter class, and their interaction, allowing the causal effect of each postcard to vary across voter engagement levels. We estimate that the Neighbors postcard raises the probability of voting by about 8.1 percentage points on average (95% CI: 7.5–8.7 percentage points), with the effect largest among Sometimes Vote and Always Vote voters (approximately 8.6 and 9.0 percentage points respectively) and smallest among Rarely Vote voters (approximately 4.4 percentage points).
 
 
 
