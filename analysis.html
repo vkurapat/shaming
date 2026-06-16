@@ -83,6 +83,81 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <p>Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters’ past turnout records to their neighbors — on the probability of voting in the August 2006 primary. However, because the experiment was conducted in Michigan in 2006, the estimated effect of the Neighbors postcard may not transfer to Texas in 2026. Both the political environment and voter demographics differ substantially, and the novelty of social-pressure postcards has likely diminished over two decades.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>parsnip model object
+
+
+Call:  stats::glm(formula = voted ~ age + sex + treatment * voter_class, 
+    family = stats::binomial, data = data)
+
+Coefficients:
+                                  (Intercept)  
+                                    -2.434345  
+                                          age  
+                                     0.012088  
+                                      sexMale  
+                                     0.035584  
+                          treatmentCivic Duty  
+                                     0.086052  
+                           treatmentHawthorne  
+                                     0.070664  
+                                treatmentSelf  
+                                     0.202359  
+                           treatmentNeighbors  
+                                     0.358818  
+                    voter_classSometimes Vote  
+                                     0.819714  
+                       voter_classAlways Vote  
+                                     1.608953  
+treatmentCivic Duty:voter_classSometimes Vote  
+                                     0.030790  
+ treatmentHawthorne:voter_classSometimes Vote  
+                                     0.058912  
+      treatmentSelf:voter_classSometimes Vote  
+                                     0.053162  
+ treatmentNeighbors:voter_classSometimes Vote  
+                                     0.040577  
+   treatmentCivic Duty:voter_classAlways Vote  
+                                    -0.051275  
+    treatmentHawthorne:voter_classAlways Vote  
+                                     0.062667  
+         treatmentSelf:voter_classAlways Vote  
+                                    -0.005777  
+    treatmentNeighbors:voter_classAlways Vote  
+                                     0.006270  
+
+Degrees of Freedom: 344083 Total (i.e. Null);  344067 Residual
+Null Deviance:      429200 
+Residual Deviance: 407900   AIC: 408000</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code># Attaching packages: easystats 0.7.6
+✔ bayestestR  0.18.1   ✔ correlation 0.8.8 
+✔ datawizard  1.3.1    ✔ effectsize  1.0.2 
+✔ insight     1.5.1    ✔ modelbased  0.15.0
+✔ performance 0.17.0   ✔ parameters  0.29.1
+✔ report      0.6.4    ✔ see         0.14.0</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The model has an integer or a discrete response variable.
+  It is recommended to switch to a dot-plot style, e.g.
+  `plot(check_model(model), type = "discrete_dots"`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Ignoring unknown labels:
+• size : ""</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 </main>
 <!-- /main column -->

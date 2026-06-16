@@ -57,6 +57,22 @@ x |>
 Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters' past turnout records to their neighbors — on the probability of voting in the August 2006 primary. However, because the experiment was conducted in Michigan in 2006, the estimated effect of the Neighbors postcard may not transfer to Texas in 2026. Both the political environment and voter demographics differ substantially, and the novelty of social-pressure postcards has likely diminished over two decades.
 
 
+```{r}
+logistic_reg(engine = "glm") |> fit(voted ~ age + sex + treatment*voter_class, data = x)
+```
+
+```{r}
+#| cache: true
+fit_shaming <- logistic_reg(engine = "glm") |> fit(voted ~ age + sex + treatment*voter_class, data = x)
+```
+
+```{r}
+library(easystats)
+check_predictions(extract_fit_engine(fit_shaming))
+```
+
+
+
 
 
 
