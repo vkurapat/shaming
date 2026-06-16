@@ -1,0 +1,60 @@
+---
+title: "Shaming"
+author: "Var Kurapati"
+format: html
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(primer.data)
+```
+```{r}
+#| cache: true
+x <- shaming |>
+  mutate(civ_engage = primary_00 + general_00 + primary_02 + 
+                      general_02 + primary_04 + general_04) |>
+  select(primary_06, treatment, sex, age, civ_engage) |>
+  drop_na() |>
+  mutate(
+    voter_class = cut(civ_engage,
+                      breaks = c(-Inf, 2, 4, Inf),
+                      labels = c("Rarely Vote", "Sometimes Vote", "Always Vote")),
+    voter_class = factor(voter_class, 
+                         levels = c("Rarely Vote", "Sometimes Vote", "Always Vote")),
+    voted = factor(primary_06)
+  ) |>
+  drop_na()
+```
+
+```{r}
+x |>
+  group_by(treatment, voter_class) |>
+  summarize(turnout = mean(primary_06 == "Yes"), .groups = "drop") |>
+  ggplot(aes(x = treatment, y = turnout, fill = treatment)) +
+  geom_col() +
+  geom_text(aes(label = scales::label_percent(accuracy = 0.1)(turnout)),
+            vjust = -0.5, size = 3) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  facet_wrap(~ voter_class) +
+  labs(
+    title = "August 2006 Primary Turnout by Treatment and Voter Class",
+    subtitle = "Neighbors postcard shows largest effect across all voter classes",
+    x = "Treatment",
+    y = "Turnout Rate",
+    fill = "Treatment",
+    caption = "Source: Gerber, Green, Larimer 2008 via primer.data::shaming"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_blank())
+```
+
+Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters' past turnout records to their neighbors — on the probability of voting in the August 2006 primary.
+
+
+
+
+
+
