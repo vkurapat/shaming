@@ -12,6 +12,25 @@ library(tidyverse)
 library(primer.data)
 library(tidymodels)
 library(broom)
+library(gt)
+```
+
+Here's the clean version:
+---
+title: "Shaming"
+author: "Var Kurapati"
+format: html
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(primer.data)
+library(tidymodels)
+library(broom)
+library(gt)
 ```
 
 ```{r}
@@ -54,12 +73,8 @@ x |>
   theme(axis.text.x = element_blank())
 ```
 
-Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters' past turnout records to their neighbors — on the probability of voting in the August 2006 primary. However, because the experiment was conducted in Michigan in 2006, the estimated effect of the Neighbors postcard may not transfer to Texas in 2026. Both the political environment and voter demographics differ substantially, and the novelty of social-pressure postcards has likely diminished over two decades.
+Voter turnout in primary elections is notoriously difficult to influence, yet social-pressure postcards have emerged as one of the most effective get-out-the-vote interventions ever documented. Using data from the Gerber, Green, and Larimer (2008) field experiment on 344,000 registered Michigan voters, we estimate the average causal effect of the Neighbors postcard — which revealed voters' past turnout records to their neighbors — on the probability of voting in the August 2006 primary. However, because the experiment was conducted in Michigan in 2006, the estimated effect of the Neighbors postcard may not transfer to Texas in 2026. Both the political environment and voter demographics differ substantially, and the novelty of social-pressure postcards has likely diminished over two decades. We model the probability of voting as a Bernoulli variable which is a logistic function of age, sex, treatment, voter class, and their interaction, allowing the causal effect of each postcard to vary across voter engagement levels.
 
-
-```{r}
-logistic_reg(engine = "glm") |> fit(voted ~ age + sex + treatment*voter_class, data = x)
-```
 
 ```{r}
 #| cache: true
@@ -67,9 +82,14 @@ fit_shaming <- logistic_reg(engine = "glm") |> fit(voted ~ age + sex + treatment
 ```
 
 ```{r}
-library(easystats)
-check_predictions(extract_fit_engine(fit_shaming))
+tidy(fit_shaming, conf.int = TRUE) |>
+  select(term, estimate, conf.low, conf.high) |>
+  mutate(across(c(estimate, conf.low, conf.high), \(x) round(x, 3))) |>
+  gt() |>
+  tab_header(title = "Estimates and 95% Confidence Intervals for Parameters",
+             subtitle = "Source: Gerber, Green, Larimer 2008 via primer.data::shaming")
 ```
+
 
 
 
